@@ -1,0 +1,60 @@
+---
+title: "HW5_JAH"
+author: "Jasmine Holloway"
+date: "2024-08-11"
+output: html_document
+---
+
+```{r setup, }
+library(ggplot2)
+library(tidyr)
+library(lubridate)
+
+load('/cloud/project/house_prices.rda')
+ggplot(house_prices, aes(x=date, y=house_price_index, color=state)) + 
+  geom_line() + 
+  facet_wrap(vars(state)) +
+  scale_x_continuous(breaks = ymd(c("1980-01-01", "2000-01-01", "2020-01-01")), labels = c("80", "00", "20"))+
+  labs(x = "Year", y="House Price Index", title = "House Price Index Trend Over Years per State") +
+  theme(legend.position = "none")
+
+
+#1B
+
+house_reshaped <- house_prices %>%
+  gather(key = "measure", value = "value", house_price_index, unemploy_perc, -state, -house_price_perc)
+
+
+#1C
+
+ggplot(house_reshaped, aes(x=date, y=value, color=measure)) + 
+  geom_line() + 
+  facet_wrap(vars(state)) +
+  scale_x_continuous(breaks = ymd(c("1980-01-01","2000-01-01", "2020-01-01")), labels = c("80", "00", "20"))+
+  labs(x = "Year", y="House Price Index", title = "House Price Index Trend Over Years per State") +
+  theme(legend.position = "bottom")
+
+#This is not a good graph to present these two pieces of information because the scale is so different. 
+#It is virtually impossible to see any variation in the unemployment percentage because values are so 
+#they do not register. The top unemployment percentage is 18.8 which is hard to see on this scale to 350. 
+
+
+
+
+#2
+
+house_prices%>%gather(key=measure, value=value, -c(house_price_index, date, state))->house_reshaped
+
+#ANALYSIS:
+#This operation changes the data set in that it groups the house_price_perc and unemploy_perc together in a new #column "measure" and the values for each in a new column "values". 
+
+my_palette <- c("#bc5090", "#58508d", "#003f5c", "#ff6361", "#ffa600")
+
+ggplot(house_reshaped, aes(x=date, y=value, color=measure)) + 
+  geom_line() + 
+  facet_wrap(vars(state)) +
+  scale_x_continuous(breaks = ymd(c("1980-01-01","2000-01-01", "2020-01-01")), labels = c("80", "00", "20"))+
+  labs(x = "Year", title = "House Price Percent & Unemployment Percentage Trend Over Years per State") +
+  theme(legend.position = "bottom")+
+  scale_color_manual(values = my_palette)
+  
